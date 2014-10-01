@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<entry key="DBDialect">MYSQL</entry>
+	<entry key="TDSArchiveDBName">archive</entry>
+    <entry key="TDSSessionDBName">session</entry>
+    <entry key="TDSConfigsDBName">configs</entry>
+    <entry key="ItembankDBName">itembank</entry>
+    <entry key="AppName">Maintenance</entry>
+    <entry key="TDSReportsRootDirectory">/usr/local/tomcat/resources/tds/tdsreports/</entry>
+    <entry key="jdbc.userName">${jdbc.userName}</entry> 
+ 	<entry key="jdbc.password">${jdbc.password}</entry> 
+ 	<entry key="jdbc.url">${jdbc.url}</entry> 
+ 	<entry key="jdbc.driver">com.mysql.jdbc.Driver</entry>
+</properties>

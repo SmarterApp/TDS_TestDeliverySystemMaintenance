@@ -7,11 +7,16 @@
   <artifactId>maintenance</artifactId>
   <version>0.0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <parent>
-		<groupId>org.opentestsystem.shared</groupId>
-		<artifactId>shared-master</artifactId>
-		<version>1.0.1-BUILD-SNAPSHOT</version>
-	</parent>
+
+    <parent>
+        <groupId>org.opentestsystem.shared</groupId>
+        <artifactId>shared-master</artifactId>
+        <version>3.0.1</version>
+    </parent>
+
+    <properties>
+        <tds-dll.version>0.0.1-SNAPSHOT</tds-dll.version>
+    </properties>
   
   	<licenses>
 		<license>
@@ -50,17 +55,18 @@
 	    <dependency>
 			<groupId>org.opentestsystem.delivery</groupId>
 			<artifactId>tds-dll-api</artifactId>
+            <version>${tds-dll.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.opentestsystem.delivery</groupId>
 			<artifactId>tds-dll-mysql</artifactId>
+            <version>${tds-dll.version}</version>
 		</dependency>
 		 <dependency>
                <groupId>org.opentestsystem.shared</groupId>
                <artifactId>shared-tr-api</artifactId>
          </dependency>
 
-		
 		<dependency>
 			<groupId>com.mchange</groupId>
 			<artifactId>c3p0</artifactId>
@@ -73,7 +79,7 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId> log4j</groupId>
+			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<scope>compile</scope>
 		</dependency>

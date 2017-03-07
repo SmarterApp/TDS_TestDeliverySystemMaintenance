@@ -15,7 +15,7 @@
     </parent>
 
     <properties>
-        <tds-dll.version>0.0.1-SNAPSHOT</tds-dll.version>
+        <tds-dll.version>3.0.0</tds-dll.version>
     </properties>
   
   	<licenses>

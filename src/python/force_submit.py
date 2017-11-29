@@ -10,36 +10,12 @@ import sys
 import requests
 
 
-# SETTINGS:
-# Put your own version of these values in settings_secret.py and they'll be overridden.
-# Don't use the dict, use the key names as top level variables. For example, your file
-# could contain (uncommented, of course):
-# ENDPOINT = "http://example.com"
-# SSL_CHECKS = True
-# ... etc.
-
-settings = {}
-# The client (e.g. 'SBAC_PT') will be appended to this URL - please end URLs with a forward slash.
-settings['ENDPOINT'] = "http://localhost:8080/proctor/exams/expire/"
-settings['CLIENT'] = "SBAC_PT"
-settings['SSL_CHECKS'] = True  # Should be False for production.
-
-# SUPER SENSITIVE AUTH INFO (these are fake - put yours in settings_secret.py)
-settings['AUTH_ENDPOINT'] = "https://localhost/auth/oauth2/access_token?realm=/sbac"
-settings['AUTH_PAYLOAD'] = {
-    "client_id": "me",
-    "client_secret": "secret",
-    "grant_type": "password",
-    "password": "password",
-    "username": "me@example.com"
-}
-
-# END SETTINGS SECTION - now we override them if settings_secret.py is present.
+# If the file settings_secret.py isn't detected, exit with a nasty message.
 try:
     import settings_secret as settings
 except:
-    print("*** USING INTERNAL SETTINGS.")
-    print("*** Please create a settings_secret.py and add your settings there!")
+    print("Could not find settings_secret.py file. I don't know what to do!")
+    sys.exit(1)
 
 if settings.SSL_CHECKS is False:
     print("WARNING: Disabling insecure SSL request warnings! NOT FOR PROD!")
@@ -78,28 +54,49 @@ def main(argv):
     start_time = datetime.datetime.now()
     print("\nStarting at %s\n" % start_time)
 
+    count = do_force_submit(endpoint, client, progress)
+
+    end_time = datetime.datetime.now()
+    deltasecs = (end_time - start_time).total_seconds()
+    print("\nSubmitted %d Exams. Completed at %s, Elapsed %s" % (count, end_time, deltasecs))
+
+
+def do_force_submit(endpoint, client, progress):
     bearer_token = get_bearer_token(
         settings.AUTH_PAYLOAD.get('username', None),
         settings.AUTH_PAYLOAD.get('password', None))
     print("Received bearer token '%s'" % bearer_token)
 
-    success = post(endpoint, client, bearer_token, progress)
+    count = 0
+    while True:
+        response = post(endpoint, client, bearer_token, progress)
+        if response.status_code == 200:
+            processed, more = process_success_response(response)
+            count += processed
+            if not more:
+                break
+        else:
+            raise RuntimeError("Proctor Exam Expire API call failed with code: %d, %s: %s" % (
+                response.status_code, response.reason, response.content))
+    return count
 
-    end_time = datetime.datetime.now()
-    deltasecs = (end_time - start_time).total_seconds()
-    print("\nRequest %s at %s, Elapsed %s" % ("succeeded" if success else "failed", end_time, deltasecs))
+
+# Parses and prints a successful response from server.
+# Returns True if there are more records to fetch, else False
+def process_success_response(response):
+    content = json.loads(response.content.decode("utf-8"))
+    more = content.get('additionalExamsToExpire')
+    exams = content.get('expiredExams')
+    processed = len(exams)
+    print("Expired %d Exams." % processed)
+    print("All done!" if not more else "Fetching more...")
+    return processed, more
 
 
 def post(endpoint, client, bearer_token, progress):
     headers = {"Content-Type": "application/json", "Authorization": "Bearer %s" % bearer_token}
     progress("POSTing to '%s'" % (endpoint + client))
-    response = requests.post(endpoint + client, headers=headers, data=json.dumps(''), verify=settings.SSL_CHECKS)
-    if response.status_code == 200:
-        return True
-    else:
-        raise RuntimeError("Proctor Exam Expire API call failed with code: %d, %s: %s" % (
-            response.status_code, response.reason, response.content))
-    return False
+    return requests.post(endpoint + client, headers=headers, data=json.dumps(''), verify=settings.SSL_CHECKS)
 
 
 def get_bearer_token(username, password):

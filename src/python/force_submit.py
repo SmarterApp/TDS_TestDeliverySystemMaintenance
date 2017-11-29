@@ -29,7 +29,7 @@ def main(argv):
     start_time = datetime.datetime.now()
     print("\nStarting at %s\n" % start_time, file=sys.stderr)
 
-    results = do_force_submit(settings.ENDPOINT, settings.CLIENT)
+    results = do_force_submit(settings.ENDPOINT, settings.CLIENT_NAME)
 
     end_time = datetime.datetime.now()
     deltasecs = (end_time - start_time).total_seconds()

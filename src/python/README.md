@@ -4,6 +4,8 @@
 ### Description
 This command line utility calls Proctor's 'expire exams' endpoint repeatedly until there are no more exams to expire. It will then print a csv data table to standard out containing details about all the exams that were expired during the session. All diagnostic output is written to standard error.
 
+The endpoint for force submit in Proctor is currently https://PROCTOR_URL/proctor/Services/exams/expire/CLIENT_NAME. You will need to replace PROCTOR_URL to point to whatever Proctor you have deployed, and CLIENT_NAME with your client name.
+
 #### force_submit.py
 This is the utility script to run. It takes no arguments and is meant to be run from crontab. Because only the csv data goes to standard out, you can run it like this to create a csv file containing all the expired exam details:
 ```
